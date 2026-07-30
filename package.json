@@ -6,6 +6,14 @@
   "publisher": "jayesh-anupoju",
   "license": "MIT",
   "author": "Jayesh Anupoju",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janupoju-sudo/Rosetta-Bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/janupoju-sudo/Rosetta-Bridge/issues"
+  },
+  "homepage": "https://github.com/janupoju-sudo/Rosetta-Bridge#readme",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -23,6 +31,11 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#101216",
+    "theme": "dark"
+  },
   "contributes": {
     "commands": [
       {

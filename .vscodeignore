@@ -2,6 +2,9 @@
 .vscode-test/**
 src/**
 out/**
+scripts/**
+.preview/**
+node_modules/**
 .gitignore
 .eslintrc.json
 esbuild.js
@@ -10,6 +13,10 @@ tsconfig.json
 .mocharc.json
 **/*.map
 **/*.ts
+media/icon.svg
 PRD.md
+PRODUCT.md
+DESIGN.md
+HANDOFF.md
 docs/**
-node_modules/**
+package-lock.json
