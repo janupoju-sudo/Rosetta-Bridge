@@ -1,7 +1,7 @@
 # Rosetta Bridge — Session Handoff & Context Dump
 
 **Last updated:** 2026-07-30
-**Status:** V1.0 core + Git Diff built, working end-to-end in the Extension Development Host with real Copilot. Distinctive UI shipped. Not yet published.
+**Status:** V1.0 core + Git Diff built, working end-to-end in the Extension Development Host with real Copilot. Distinctive UI shipped. **Pushed to GitHub** (`janupoju-sudo/Rosetta-Bridge`, public). **Marketplace prep done** (packages cleanly). Not yet published.
 
 ---
 
@@ -128,17 +128,19 @@ node scripts/preview.mjs && node scripts/shoot.mjs   # → .preview/shots/
 - [ ] Optional refactor: de-duplicate webview markup between `SidebarViewProvider.getHtml` and `scripts/preview.mjs`.
 - [ ] Consider caching `vscode.lm` model selection / handling very large selections (token limits).
 
-### C. Marketplace publishing prep (discussed, NOT started)
-Before `vsce package` will succeed cleanly:
-- [ ] Add a **`LICENSE`** file (README declares MIT; no file yet).
-- [ ] Add **`repository`** field to package.json (need the GitHub repo URL).
-- [ ] Add a **128×128 PNG marketplace `icon`** (current `media/rosetta.svg` is monochrome SVG — not valid as the gallery icon). Can render a colored bridge/pennant mark to PNG via the installed Chromium.
-- [ ] Confirm **`publisher`** in package.json matches the Marketplace publisher ID to be created.
+### C. Marketplace publishing prep ✅ DONE (2026-07-30) — not yet published
+Prep completed and pushed (commit `a7c116f`); `vsce package` succeeds with zero warnings:
+- [x] Added **`LICENSE`** (MIT, © 2026 Jayesh Anupoju) and **`CHANGELOG.md`** (1.0.0).
+- [x] Added **`repository`**, `bugs`, `homepage` → `https://github.com/janupoju-sudo/Rosetta-Bridge`.
+- [x] Added a **256×256 PNG marketplace `icon`** (`media/icon.png`, teal/amber bridge) + SVG source (`media/icon.svg`) + reproducible `scripts/render-icon.mjs`; wired `icon` + `galleryBanner` in package.json. (Activity-bar icon `media/rosetta.svg` kept separate.)
+- [x] Tightened **`.vscodeignore`** — `.vsix` ships only `dist/`, `media/{icon.png,rosetta.svg}`, README, LICENSE, CHANGELOG, package.json.
+- [x] Validated: **`rosetta-bridge-1.0.0.vsix`** built (11 files, ~78 KB, gitignored — regenerate with `npx @vscode/vsce package`).
+- [ ] **STILL OPEN:** confirm **`publisher`** — package.json has `"publisher": "jayesh-anupoju"`, which must match the Marketplace publisher ID you create (or change one to align).
 
-Publishing steps (account actions — user only):
+Publishing steps (account actions — user only; NOT done, do NOT run yet unless asked):
 1. Azure DevOps → create **PAT** (scope: Marketplace → Manage, all orgs).
-2. https://marketplace.visualstudio.com/manage → create **publisher** (ID must match package.json).
-3. `npm i -g @vscode/vsce` → `vsce login <publisher>` → `vsce package` → test `.vsix` → `vsce publish`.
+2. https://marketplace.visualstudio.com/manage → create **publisher** (ID must match package.json `publisher`).
+3. `npm i -g @vscode/vsce` → `vsce login <publisher>` → `vsce package` → test `.vsix` (`code --install-extension rosetta-bridge-1.0.0.vsix`) → `vsce publish`.
 4. **Also publish to Open VSX** (`ovsx publish …`) so **Cursor / VSCodium / Windsurf** users (the PRD's "vibe coders") can install it — those editors don't use the MS Marketplace.
 
 ### D. Future (PRD V1.1 — out of current scope)
@@ -150,7 +152,8 @@ Publishing steps (account actions — user only):
 ---
 
 ## 7. Open decisions for next session
-- GitHub repo URL (for `repository` field + Open VSX namespace).
-- Marketplace **publisher ID** (must match `package.json` `"publisher": "jayesh-anupoju"` or update it).
-- Whether to `git init` this project now.
+- Marketplace **publisher ID** (must match `package.json` `"publisher": "jayesh-anupoju"` or update it) — needed before `vsce publish`.
 - Whether to run the heavier `@vscode/test-electron` integration suite locally or in CI.
+- Whether to `git init` this project *as its own working repo for the diff flow* — it's now a git repo (pushed to GitHub), so **Summarize Staged Changes can be tested here** once you stage a change.
+
+**Resolved this session:** GitHub repo created + pushed (`https://github.com/janupoju-sudo/Rosetta-Bridge`, public, `main`); marketplace prep done (§6C).
