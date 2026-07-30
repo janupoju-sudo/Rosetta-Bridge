@@ -124,9 +124,10 @@ node scripts/preview.mjs && node scripts/shoot.mjs   # → .preview/shots/
   - Fixed a tooling incompatibility along the way: bumped `@vscode/test-cli` `0.0.9→0.0.15` and `@vscode/test-electron` `2.4.0→3.1.0` (older runner looked for a binary named `Electron`; VS Code 1.131 ships `Code`, causing `spawn … ENOENT`). Cleared `.vscode-test/` cache to force a fresh download.
 - [x] **Streaming pipeline covered** — extracted the decode loop from `Orchestrator` into a pure `runDecode(provider, messages, meta, sink, token)` in `src/core/streaming.ts` (behind a `StreamSink` interface; the orchestrator's sink forwards to the webview). Unit tests (`runDecode.test.ts`) with a stubbed provider assert: chunk order → done, `ProviderError` → `error` and no `done`, non-Error fallback message, and cancellation stops forwarding. No VS Code host needed. `DecodeMeta` moved into this module.
 - [x] Manual F5 verification (done earlier this session): selection translate, whole-file fallback, channel switch, copy — all working with real Copilot.
-- [ ] Staged-diff path still untested against a real repo *with staged changes* (this folder is now a git repo — stage something and run "Summarize Staged Changes" to verify).
+- [x] **Real staged-diff pipeline verified** — ran the production `spawnGitRunner` + `getStagedDiff` against this repo: a staged change classifies as `kind:diff` (valid unified diff), nothing staged classifies as `kind:empty` with the friendly notice. Working tree left clean. The full in-panel LLM summary uses the identical `run()→runDecode()` path as Translate Selection (already confirmed live), so only a cosmetic F5 glance remains optional.
+- [ ] *(Optional future)* durable integration test that creates a temp git repo and runs the real runner, instead of the one-off manual check above.
 
-**Full suite: 21 unit + 7 integration = 28 passing.**
+**Full suite: 21 unit + 7 integration = 28 passing.** Task #6 complete.
 
 ### B. Polish
 - [ ] Optionally regenerate the full screenshot set for docs (EXEC-first).
