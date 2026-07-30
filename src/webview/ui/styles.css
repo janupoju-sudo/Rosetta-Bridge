@@ -1,0 +1,511 @@
+/*
+ * ROSETTA BRIDGE — Signal Station / Codebook
+ * -----------------------------------------------------------------------------
+ * THESIS:  A decoding station, not a chat box. One source, many registers;
+ *          choosing the audience is hoisting a channel. Refuses the message bubble.
+ * OWN-WORLD: Theme-neutral instrument ground (all chrome from --vscode-* tokens);
+ *          codebook-tabular mono labels meeting humanist body; hairline register
+ *          rules and a tether; two precise signal accents, one per channel.
+ * STORY:   Hoist a channel → drop an intercepted selection → watch it decode line
+ *          by line → copy the transmission out.
+ * FIRST VIEWPORT: masthead → hoisted channel pennants → decode keys → intercept
+ *          chip w/ tether → decode field. Primary action is the lit DECODE key.
+ * FORM:    Signal Station / Codebook · grounded rank #7 · staging tethered-bench ·
+ *          seed c348e88d.
+ * -----------------------------------------------------------------------------
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Two signal-channel accents — used only as small precise marks. */
+  --sig-plain: #23b2a0;
+  --sig-exec: #e0912f;
+
+  --rule: color-mix(in srgb, var(--vscode-foreground) 20%, transparent);
+  --rule-strong: color-mix(in srgb, var(--vscode-foreground) 34%, transparent);
+  --plate-dim: color-mix(in srgb, var(--vscode-foreground) 55%, transparent);
+  --mono: var(--vscode-editor-font-family, ui-monospace, "SF Mono", Menlo, monospace);
+
+  --active-sig: var(--sig-plain);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* The [hidden] attribute must win over components that set their own display. */
+[hidden] {
+  display: none !important;
+}
+
+body.station {
+  margin: 0;
+  padding: 12px 12px 10px;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
+  color: var(--vscode-foreground);
+  background: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100vh;
+}
+
+body.station.channel-exec {
+  --active-sig: var(--sig-exec);
+}
+
+/* ── Masthead ─────────────────────────────────────────────────────────────── */
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.mark {
+  display: inline-flex;
+  color: var(--active-sig);
+  transition: color 0.25s ease;
+}
+
+.wordmark {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+}
+
+.station-tag {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  padding: 2px 6px;
+  color: var(--plate-dim);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+/* ── Channel selector (the mode toggle, as signal pennants) ───────────────── */
+.channels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.channel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 10px 10px;
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  color: var(--plate-dim);
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.channel::after {
+  /* the "hoist" underline — furled by default */
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.channel[data-mode="vibeCoder"]::after { background: var(--sig-plain); }
+.channel[data-mode="executive"]::after { background: var(--sig-exec); }
+
+.channel:hover {
+  color: var(--vscode-foreground);
+  border-color: var(--rule-strong);
+}
+
+.channel.active {
+  color: var(--vscode-foreground);
+  border-color: var(--rule-strong);
+  background: color-mix(in srgb, var(--vscode-foreground) 5%, transparent);
+}
+
+.channel.active::after {
+  transform: scaleX(1);
+}
+
+/* the pennant flag — furled (dim, lowered) vs hoisted (colored, raised) */
+.pennant {
+  flex: 0 0 auto;
+  width: 13px;
+  height: 11px;
+  border: 1px solid var(--rule-strong);
+  opacity: 0.5;
+  transform: translateY(2px);
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 26% 50%);
+}
+
+.pennant-plain {
+  background: linear-gradient(180deg, var(--sig-plain) 0 50%, transparent 50% 100%);
+}
+.pennant-exec {
+  background: linear-gradient(135deg, var(--sig-exec) 0 55%, transparent 55% 100%);
+}
+
+.channel.active .pennant {
+  opacity: 1;
+  transform: translateY(0);
+  border-color: transparent;
+}
+
+.channel-code {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+.channel-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+}
+
+/* ── Decode keys ──────────────────────────────────────────────────────────── */
+.keys {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 11px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--vscode-foreground);
+  transition: border-color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+}
+
+.key-glyph {
+  font-size: 12px;
+  opacity: 0.8;
+  letter-spacing: 0;
+}
+
+.key-primary {
+  border-color: var(--active-sig);
+  color: var(--vscode-foreground);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--active-sig) 30%, transparent);
+}
+.key-primary .key-glyph { color: var(--active-sig); opacity: 1; }
+
+.key:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--vscode-foreground) 7%, transparent);
+}
+.key-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--active-sig) 12%, transparent);
+}
+
+.key:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Feed (intercept + tether + plate/notice/decode) ──────────────────────── */
+.feed {
+  position: relative;
+  flex: 1;
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+}
+
+.intercept {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--vscode-foreground) 4%, transparent);
+}
+
+/* the accent enters through the label's signal dot, not a side-tab border */
+.intercept-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--active-sig);
+}
+
+.intercept-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--active-sig);
+}
+
+.intercept-source {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--vscode-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* the tether dropping from the intercept into the decode field — one signal rail */
+.tether {
+  width: 2px;
+  height: 10px;
+  margin-left: 0;
+  background: var(--active-sig);
+  opacity: 0.55;
+}
+
+/* idle station plate — a channel legend that teaches the two modes */
+.plate {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 14px;
+  border: 1px dashed var(--rule);
+  border-radius: 4px;
+  color: var(--plate-dim);
+}
+
+.plate-top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.plate-glyph {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--active-sig);
+  opacity: 0.9;
+}
+
+.plate-line {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--vscode-foreground);
+}
+
+.plate-sub {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.legend-row {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.legend-row .pennant {
+  opacity: 1;
+  transform: none;
+  border-color: transparent;
+  margin-top: 3px;
+}
+
+.legend-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-name {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--vscode-foreground);
+}
+
+.legend-desc {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* signal-lost notice */
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--vscode-errorForeground) 55%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--vscode-errorForeground) 8%, transparent);
+}
+
+.notice-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--vscode-errorForeground);
+}
+
+.notice-label::before {
+  content: "▚";
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.notice-text {
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* decode output field */
+.decode {
+  position: relative;
+  flex: 1;
+  padding: 4px 0 0 12px;
+  border-left: 1px solid var(--rule);
+  overflow-y: auto;
+}
+
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 1px;
+  background: var(--active-sig);
+  vertical-align: text-bottom;
+  animation: blink 1s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ── Decoded markdown ─────────────────────────────────────────────────────── */
+.output {
+  line-height: 1.55;
+  word-wrap: break-word;
+  font-size: 12.5px;
+}
+
+.markdown-body :first-child { margin-top: 0; }
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  margin: 1.1em 0 0.35em;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vscode-foreground);
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.markdown-body p { margin: 0.5em 0; }
+
+.markdown-body strong {
+  color: var(--vscode-foreground);
+  font-weight: 600;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.25em;
+  margin: 0.45em 0;
+}
+
+.markdown-body li { margin: 0.28em 0; }
+
+.markdown-body code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+  background: color-mix(in srgb, var(--vscode-foreground) 9%, transparent);
+  padding: 0.08em 0.34em;
+  border-radius: 3px;
+}
+
+.markdown-body pre {
+  background: var(--vscode-textCodeBlock-background, color-mix(in srgb, var(--vscode-foreground) 8%, transparent));
+  padding: 9px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+  overflow-x: auto;
+}
+
+.markdown-body pre code { background: none; padding: 0; }
+
+.markdown-body a {
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+}
+.markdown-body a:hover { text-decoration: underline; }
+
+/* ── Transmit ─────────────────────────────────────────────────────────────── */
+.transmit {
+  display: flex;
+}
+
+.key-transmit {
+  width: 100%;
+  justify-content: center;
+  border-style: dashed;
+  color: var(--plate-dim);
+}
+.key-transmit:hover {
+  color: var(--vscode-foreground);
+  border-style: solid;
+}
+.key-transmit.sent {
+  color: var(--active-sig);
+  border-color: var(--active-sig);
+  border-style: solid;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .channel::after,
+  .pennant,
+  .mark,
+  .key { transition: none; }
+  .cursor { animation: none; }
+}

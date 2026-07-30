@@ -1,0 +1,130 @@
+{
+  "name": "rosetta-bridge",
+  "displayName": "Rosetta Bridge",
+  "description": "Real-time AI translation layer between source code and business value. Explain code in plain English (Vibe Coder mode) or executive ROI briefings (Executive mode).",
+  "version": "1.0.0",
+  "publisher": "jayesh-anupoju",
+  "license": "MIT",
+  "author": "Jayesh Anupoju",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Education",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "copilot",
+    "explain code",
+    "documentation",
+    "code review"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rosettaBridge.translateSelection",
+        "title": "Rosetta Bridge: Translate Selection"
+      },
+      {
+        "command": "rosettaBridge.summarizeStagedChanges",
+        "title": "Rosetta Bridge: Summarize Git Staged Changes"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "rosettaBridge.translateSelection",
+          "group": "1_modification",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rosettaBridge",
+          "title": "Rosetta Bridge",
+          "icon": "media/rosetta.svg"
+        }
+      ]
+    },
+    "views": {
+      "rosettaBridge": [
+        {
+          "type": "webview",
+          "id": "rosettaBridge.panel",
+          "name": "Translator"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Rosetta Bridge",
+      "properties": {
+        "rosettaBridge.provider": {
+          "type": "string",
+          "default": "vscode-lm",
+          "enum": [
+            "vscode-lm",
+            "openai",
+            "anthropic",
+            "ollama"
+          ],
+          "enumDescriptions": [
+            "Native VS Code Language Model API (uses your GitHub Copilot seat). Zero configuration.",
+            "OpenAI (BYOK) — not yet implemented in this release.",
+            "Anthropic (BYOK) — not yet implemented in this release.",
+            "Local Ollama — not yet implemented in this release."
+          ],
+          "description": "Which LLM provider Rosetta Bridge uses. Only 'vscode-lm' is available in this release."
+        },
+        "rosettaBridge.defaultMode": {
+          "type": "string",
+          "default": "executive",
+          "enum": [
+            "executive",
+            "vibeCoder"
+          ],
+          "enumDescriptions": [
+            "Business impact and ROI briefings for executives.",
+            "Plain-English explanations for non-technical creators."
+          ],
+          "description": "The translation channel selected by default when the panel opens."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "test:unit": "mocha"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.0",
+    "@typescript-eslint/parser": "^7.14.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "mocha": "^10.5.0",
+    "playwright": "^1.62.1",
+    "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0"
+  }
+}
