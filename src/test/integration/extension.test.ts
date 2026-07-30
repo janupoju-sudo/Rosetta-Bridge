@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 import { ProviderRegistry } from "../../providers/ProviderRegistry";
 import { VSCodeLMProvider } from "../../providers/VSCodeLMProvider";
 
-const EXTENSION_ID = "jayesh-anupoju.rosetta-bridge";
+const EXTENSION_ID = "Jayanupoju.rosetta-bridge";
 
 suite("Rosetta Bridge integration", () => {
   test("extension activates", async () => {
