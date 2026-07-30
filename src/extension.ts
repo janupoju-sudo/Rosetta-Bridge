@@ -3,9 +3,10 @@ import { captureCode } from "./core/selectionCapture";
 import { getStagedDiff, messageForResult } from "./core/gitDiff";
 import { spawnGitRunner } from "./core/gitRunner";
 import { coerceMode, Mode, systemPromptForMode } from "./core/modes";
-import { buildMessages, LLMProvider, ProviderError } from "./providers/LLMProvider";
+import { DecodeMeta, runDecode, StreamSink } from "./core/streaming";
+import { buildMessages } from "./providers/LLMProvider";
 import { ProviderRegistry } from "./providers/ProviderRegistry";
-import { DecodeMeta, SidebarViewProvider } from "./webview/SidebarViewProvider";
+import { SidebarViewProvider } from "./webview/SidebarViewProvider";
 
 export function activate(context: vscode.ExtensionContext): void {
   const registry = new ProviderRegistry();
@@ -117,33 +118,17 @@ class Orchestrator {
     const meta: DecodeMeta = { source: opts.sourceLabel, channel: mode };
 
     await this.sidebar.reveal();
-    await this.stream(provider, messages, token, meta);
+    await runDecode(provider, messages, meta, this.sink, token);
   }
 
-  private async stream(
-    provider: LLMProvider,
-    messages: ReturnType<typeof buildMessages>,
-    token: vscode.CancellationToken,
-    meta: DecodeMeta,
-  ): Promise<void> {
-    this.sidebar.startStream(meta);
-    try {
-      for await (const fragment of provider.stream(messages, token)) {
-        if (token.isCancellationRequested) {
-          break;
-        }
-        this.sidebar.appendChunk(fragment);
-      }
-      this.sidebar.endStream();
-    } catch (err) {
-      const message =
-        err instanceof ProviderError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : "Something went wrong while translating.";
-      this.sidebar.showError(message);
-    }
+  /** Forwards the decode loop's output to the webview. */
+  private get sink(): StreamSink {
+    return {
+      start: (meta) => this.sidebar.startStream(meta),
+      chunk: (text) => this.sidebar.appendChunk(text),
+      done: () => this.sidebar.endStream(),
+      error: (message) => this.sidebar.showError(message),
+    };
   }
 
   private async fail(message: string): Promise<void> {

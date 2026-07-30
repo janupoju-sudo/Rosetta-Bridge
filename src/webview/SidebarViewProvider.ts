@@ -1,13 +1,8 @@
 import * as vscode from "vscode";
 import { coerceMode, Mode } from "../core/modes";
+import type { DecodeMeta } from "../core/streaming";
 
-/** Describes the captured source being decoded (the "intercept"). */
-export interface DecodeMeta {
-  /** Short provenance label, e.g. "main.ts · selection · 42 ln" or "staged diff". */
-  source: string;
-  /** The channel (mode) this decode runs on. */
-  channel: Mode;
-}
+export type { DecodeMeta };
 
 /** Messages the extension sends to the webview. */
 type ToWebview =

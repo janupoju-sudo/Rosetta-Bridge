@@ -67,6 +67,7 @@ src/
     selectionCapture.ts         FR-1: selection → whole-doc fallback
     gitDiff.ts                  FR-2: git diff --cached classification (pure)
     gitRunner.ts                real child_process git runner
+    streaming.ts                DecodeMeta, StreamSink, runDecode (pure stream loop; unit-tested)
   providers/
     LLMProvider.ts              interface + ProviderError + buildMessages
     VSCodeLMProvider.ts         vscode.lm implementation
@@ -119,11 +120,13 @@ node scripts/preview.mjs && node scripts/shoot.mjs   # → .preview/shots/
 ## 6. REMAINING TASKS
 
 ### A. Integration tests + verification (task #6)
-- [x] **Integration suite passing** — `npm test` (`@vscode/test-electron`) runs **7 tests** green: extension activates, both commands registered, registry resolves + falls back, provider reports unavailable in a bare host, and both commands degrade gracefully (no editor / no model / no workspace) without throwing. Full suite: **17 unit + 7 integration = 24 passing.**
+- [x] **Integration suite passing** — `npm test` (`@vscode/test-electron`) runs **7 tests** green: extension activates, both commands registered, registry resolves + falls back, provider reports unavailable in a bare host, and both commands degrade gracefully (no editor / no model / no workspace) without throwing.
   - Fixed a tooling incompatibility along the way: bumped `@vscode/test-cli` `0.0.9→0.0.15` and `@vscode/test-electron` `2.4.0→3.1.0` (older runner looked for a binary named `Electron`; VS Code 1.131 ships `Code`, causing `spawn … ENOENT`). Cleared `.vscode-test/` cache to force a fresh download.
+- [x] **Streaming pipeline covered** — extracted the decode loop from `Orchestrator` into a pure `runDecode(provider, messages, meta, sink, token)` in `src/core/streaming.ts` (behind a `StreamSink` interface; the orchestrator's sink forwards to the webview). Unit tests (`runDecode.test.ts`) with a stubbed provider assert: chunk order → done, `ProviderError` → `error` and no `done`, non-Error fallback message, and cancellation stops forwarding. No VS Code host needed. `DecodeMeta` moved into this module.
 - [x] Manual F5 verification (done earlier this session): selection translate, whole-file fallback, channel switch, copy — all working with real Copilot.
-- [ ] **Not yet exercised end-to-end:** real streaming happy-path via a stubbed LM (integration host has no Copilot, so the stream path isn't asserted — only the guard paths are). Optional: refactor the orchestrator to accept an injected provider for a streaming test.
 - [ ] Staged-diff path still untested against a real repo *with staged changes* (this folder is now a git repo — stage something and run "Summarize Staged Changes" to verify).
+
+**Full suite: 21 unit + 7 integration = 28 passing.**
 
 ### B. Polish
 - [ ] Optionally regenerate the full screenshot set for docs (EXEC-first).
