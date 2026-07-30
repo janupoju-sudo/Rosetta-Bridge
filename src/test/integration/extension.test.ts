@@ -1,6 +1,7 @@
 import * as assert from "node:assert";
 import * as vscode from "vscode";
 import { ProviderRegistry } from "../../providers/ProviderRegistry";
+import { VSCodeLMProvider } from "../../providers/VSCodeLMProvider";
 
 const EXTENSION_ID = "jayesh-anupoju.rosetta-bridge";
 
@@ -29,5 +30,29 @@ suite("Rosetta Bridge integration", () => {
     const { provider, fallbackFrom } = registry.resolve("openai");
     assert.strictEqual(provider.id, "vscode-lm");
     assert.strictEqual(fallbackFrom, "openai");
+  });
+
+  test("VSCodeLMProvider reports unavailable when no Copilot model is present", async () => {
+    // The bare test host has no Copilot extension, so pre-flight must return a
+    // non-null reason string rather than throwing.
+    const reason = await new VSCodeLMProvider().isAvailable();
+    assert.ok(
+      typeof reason === "string" && reason.length > 0,
+      "expected a human-readable unavailability reason",
+    );
+  });
+
+  test("translateSelection degrades gracefully with no editor or model", async () => {
+    // No active editor + no language model must resolve (surfacing a notice in
+    // the webview), never reject into the UI thread.
+    await assert.doesNotReject(
+      Promise.resolve(vscode.commands.executeCommand("rosettaBridge.translateSelection")),
+    );
+  });
+
+  test("summarizeStagedChanges degrades gracefully with no workspace", async () => {
+    await assert.doesNotReject(
+      Promise.resolve(vscode.commands.executeCommand("rosettaBridge.summarizeStagedChanges")),
+    );
   });
 });

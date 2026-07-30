@@ -118,10 +118,12 @@ node scripts/preview.mjs && node scripts/shoot.mjs   # → .preview/shots/
 
 ## 6. REMAINING TASKS
 
-### A. Integration tests + verification (task #6 — not done)
-- [ ] Run the integration suite: `npm test` (`@vscode/test-electron`) — downloads a full VS Code and launches it; not yet executed. Verify: extension activates, both commands registered, registry resolves/falls back, streaming reaches the webview.
-- [ ] Manual F5 verification pass of all paths: selection, whole-file fallback, staged-diff (needs a **git repo** — this folder is NOT git-initialized yet, so "Summarize Staged Changes" currently returns "not a Git repository"), channel switch, copy, error states.
-- [ ] Consider `git init` on this project so the diff flow is testable here.
+### A. Integration tests + verification (task #6)
+- [x] **Integration suite passing** — `npm test` (`@vscode/test-electron`) runs **7 tests** green: extension activates, both commands registered, registry resolves + falls back, provider reports unavailable in a bare host, and both commands degrade gracefully (no editor / no model / no workspace) without throwing. Full suite: **17 unit + 7 integration = 24 passing.**
+  - Fixed a tooling incompatibility along the way: bumped `@vscode/test-cli` `0.0.9→0.0.15` and `@vscode/test-electron` `2.4.0→3.1.0` (older runner looked for a binary named `Electron`; VS Code 1.131 ships `Code`, causing `spawn … ENOENT`). Cleared `.vscode-test/` cache to force a fresh download.
+- [x] Manual F5 verification (done earlier this session): selection translate, whole-file fallback, channel switch, copy — all working with real Copilot.
+- [ ] **Not yet exercised end-to-end:** real streaming happy-path via a stubbed LM (integration host has no Copilot, so the stream path isn't asserted — only the guard paths are). Optional: refactor the orchestrator to accept an injected provider for a streaming test.
+- [ ] Staged-diff path still untested against a real repo *with staged changes* (this folder is now a git repo — stage something and run "Summarize Staged Changes" to verify).
 
 ### B. Polish
 - [ ] Optionally regenerate the full screenshot set for docs (EXEC-first).
