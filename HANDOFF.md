@@ -141,7 +141,7 @@ Prep completed and pushed (commit `a7c116f`); `vsce package` succeeds with zero 
 - [x] Added a **256×256 PNG marketplace `icon`** (`media/icon.png`, teal/amber bridge) + SVG source (`media/icon.svg`) + reproducible `scripts/render-icon.mjs`; wired `icon` + `galleryBanner` in package.json. (Activity-bar icon `media/rosetta.svg` kept separate.)
 - [x] Tightened **`.vscodeignore`** — `.vsix` ships only `dist/`, `media/{icon.png,rosetta.svg}`, README, LICENSE, CHANGELOG, package.json.
 - [x] Validated: **`rosetta-bridge-1.0.0.vsix`** built (11 files, ~78 KB, gitignored — regenerate with `npx @vscode/vsce package`).
-- [x] **Publisher set** — `package.json` `"publisher": "jaanupoju"` (extension id `jaanupoju.rosetta-bridge`; integration test updated to match). **You must create a Marketplace publisher with ID `jaanupoju`** at https://marketplace.visualstudio.com/manage before `vsce publish`.
+- [x] **Publisher set** — `package.json` `"publisher": "Jayanupoju"` (extension id `Jayanupoju.rosetta-bridge`; integration test updated to match). **You must create a Marketplace publisher with ID `Jayanupoju`** at https://marketplace.visualstudio.com/manage before `vsce publish`.
 
 Publishing steps (account actions — user only; NOT done, do NOT run yet unless asked):
 1. Azure DevOps → create **PAT** (scope: Marketplace → Manage, all orgs).
@@ -159,7 +159,7 @@ Publishing steps (account actions — user only; NOT done, do NOT run yet unless
 
 ## 7. Open decisions for next session
 - Whether to run the heavier `@vscode/test-electron` integration suite locally or in CI.
-- Ready to **publish** when you are: create the `jaanupoju` publisher + an Azure DevOps PAT, then `vsce login jaanupoju` → `vsce publish` (and `ovsx publish` for Cursor/VSCodium).
+- Ready to **publish** when you are: create the `Jayanupoju` publisher + an Azure DevOps PAT, then `vsce login Jayanupoju` → `vsce publish` (and `ovsx publish` for Cursor/VSCodium).
 - Whether to `git init` this project *as its own working repo for the diff flow* — it's now a git repo (pushed to GitHub), so **Summarize Staged Changes can be tested here** once you stage a change.
 
 **Resolved this session:** GitHub repo created + pushed (`https://github.com/janupoju-sudo/Rosetta-Bridge`, public, `main`); marketplace prep done (§6C).
