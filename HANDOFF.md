@@ -1,7 +1,11 @@
 # Rosetta Bridge — Session Handoff & Context Dump
 
 **Last updated:** 2026-07-30
-**Status:** V1.0 core + Git Diff built, working end-to-end in the Extension Development Host with real Copilot. Distinctive UI shipped. **Pushed to GitHub** (`janupoju-sudo/Rosetta-Bridge`, public). **Marketplace prep done** (packages cleanly). Not yet published.
+**Status:** 🚀 **PUBLISHED** — `Jayanupoju.rosetta-bridge v1.0.0` is live on the VS Code Marketplace. V1.0 core + Git Diff, working end-to-end with real Copilot, distinctive UI. On GitHub (`janupoju-sudo/Rosetta-Bridge`, public), 28 tests passing.
+
+- **Marketplace listing:** https://marketplace.visualstudio.com/items?itemName=Jayanupoju.rosetta-bridge
+- **Publisher hub:** https://marketplace.visualstudio.com/manage/publishers/Jayanupoju/extensions/rosetta-bridge/hub
+- **Install:** `code --install-extension Jayanupoju.rosetta-bridge` (or Extensions → search "Rosetta Bridge")
 
 ---
 
@@ -130,24 +134,31 @@ node scripts/preview.mjs && node scripts/shoot.mjs   # → .preview/shots/
 **Full suite: 21 unit + 7 integration = 28 passing.** Task #6 complete.
 
 ### B. Polish
+- [ ] **CI workflow (planned — do next session).** Add `.github/workflows/ci.yml` running on push/PR to `main`:
+  - `npm ci`; `npm run lint`; `npm run compile-tests`; `npm run test:unit`.
+  - Integration tests (`npm test`, `@vscode/test-electron`) need a display — run them under `xvfb-run` on `ubuntu-latest` (headless), or keep integration local-only and run just lint + unit + type-check in CI.
+  - Node 20; cache npm. Optionally a separate **release** job on tag `v*` that runs `npx @vscode/vsce publish -p ${{ secrets.VSCE_PAT }}` (store the PAT as the repo secret `VSCE_PAT`, never in the repo). Consider `ovsx publish` for Open VSX in the same job.
+  - Add a build badge to `README.md`.
 - [ ] Optionally regenerate the full screenshot set for docs (EXEC-first).
 - [ ] Optional refactor: de-duplicate webview markup between `SidebarViewProvider.getHtml` and `scripts/preview.mjs`.
 - [ ] Consider caching `vscode.lm` model selection / handling very large selections (token limits).
 
-### C. Marketplace publishing prep ✅ DONE (2026-07-30) — not yet published
-Prep completed and pushed (commit `a7c116f`); `vsce package` succeeds with zero warnings:
+### C. Marketplace publishing ✅ PUBLISHED (2026-07-30)
+**`Jayanupoju.rosetta-bridge v1.0.0` is live.** Published with `npx @vscode/vsce publish` after `npx @vscode/vsce login Jayanupoju` (used `npx`, not a global install, to avoid an EACCES on `/usr/local/lib`). Prep (committed `a7c116f`); `vsce package` succeeds with zero warnings:
 - [x] Added **`LICENSE`** (MIT, © 2026 Jayesh Anupoju) and **`CHANGELOG.md`** (1.0.0).
 - [x] Added **`repository`**, `bugs`, `homepage` → `https://github.com/janupoju-sudo/Rosetta-Bridge`.
 - [x] Added a **256×256 PNG marketplace `icon`** (`media/icon.png`, teal/amber bridge) + SVG source (`media/icon.svg`) + reproducible `scripts/render-icon.mjs`; wired `icon` + `galleryBanner` in package.json. (Activity-bar icon `media/rosetta.svg` kept separate.)
 - [x] Tightened **`.vscodeignore`** — `.vsix` ships only `dist/`, `media/{icon.png,rosetta.svg}`, README, LICENSE, CHANGELOG, package.json.
 - [x] Validated: **`rosetta-bridge-1.0.0.vsix`** built (11 files, ~78 KB, gitignored — regenerate with `npx @vscode/vsce package`).
-- [x] **Publisher set** — `package.json` `"publisher": "Jayanupoju"` (extension id `Jayanupoju.rosetta-bridge`; integration test updated to match). **You must create a Marketplace publisher with ID `Jayanupoju`** at https://marketplace.visualstudio.com/manage before `vsce publish`.
+- [x] **Publisher `Jayanupoju`** created on the Marketplace; `package.json` `"publisher": "Jayanupoju"` (extension id `Jayanupoju.rosetta-bridge`; integration test matches).
+- [x] **Azure DevOps PAT** created (org `janupoju`, free tier) with **Marketplace → Manage** scope, **All accessible organizations**.
+- [x] **Published** via `npx @vscode/vsce login Jayanupoju` → `npx @vscode/vsce publish`.
 
-Publishing steps (account actions — user only; NOT done, do NOT run yet unless asked):
-1. Azure DevOps → create **PAT** (scope: Marketplace → Manage, all orgs).
-2. https://marketplace.visualstudio.com/manage → create **publisher** (ID must match package.json `publisher`).
-3. `npm i -g @vscode/vsce` → `vsce login <publisher>` → `vsce package` → test `.vsix` (`code --install-extension rosetta-bridge-1.0.0.vsix`) → `vsce publish`.
-4. **Also publish to Open VSX** (`ovsx publish …`) so **Cursor / VSCodium / Windsurf** users (the PRD's "vibe coders") can install it — those editors don't use the MS Marketplace.
+**Publish future updates:** bump version + re-publish in one step — `npx @vscode/vsce publish patch` (or `minor` / `major`). PAT is cached from `vsce login`; if it expires, re-run login with a fresh PAT.
+
+- [ ] **Open VSX (still TODO)** — publish so **Cursor / VSCodium / Windsurf** users (the PRD's "vibe coders") can install it; those editors don't use the MS Marketplace. Steps: create a free token + `Jayanupoju` namespace at https://open-vsx.org (GitHub login, no Azure), then `npx ovsx publish rosetta-bridge-1.0.0.vsix -p <token>`.
+
+⚠️ **Security note:** during this session a PAT was accidentally pasted into chat and should have been revoked; only ever paste a PAT at the `vsce login` prompt in a private terminal, never in chat/files/commits.
 
 ### D. Future (PRD V1.1 — out of current scope)
 - [ ] BYOK OpenAI/Anthropic providers via `vscode.SecretStorage`.
@@ -157,9 +168,9 @@ Publishing steps (account actions — user only; NOT done, do NOT run yet unless
 
 ---
 
-## 7. Open decisions for next session
-- Whether to run the heavier `@vscode/test-electron` integration suite locally or in CI.
-- Ready to **publish** when you are: create the `Jayanupoju` publisher + an Azure DevOps PAT, then `vsce login Jayanupoju` → `vsce publish` (and `ovsx publish` for Cursor/VSCodium).
-- Whether to `git init` this project *as its own working repo for the diff flow* — it's now a git repo (pushed to GitHub), so **Summarize Staged Changes can be tested here** once you stage a change.
+## 7. Next session / open items
+- **Set up the CI workflow** (see §6B) — the main planned task.
+- **Publish to Open VSX** for Cursor/VSCodium/Windsurf users (see §6C).
+- Optionally verify the **published** build installs & runs in a clean VS Code (`code --install-extension Jayanupoju.rosetta-bridge`).
 
-**Resolved this session:** GitHub repo created + pushed (`https://github.com/janupoju-sudo/Rosetta-Bridge`, public, `main`); marketplace prep done (§6C).
+**Resolved this session:** built V1.0 + Git Diff; distinctive Signal Station UI (EXEC-primary); 28 tests passing; GitHub repo created + pushed (`janupoju-sudo/Rosetta-Bridge`); **published to the VS Code Marketplace as `Jayanupoju.rosetta-bridge v1.0.0`**.
